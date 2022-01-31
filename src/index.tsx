@@ -1,12 +1,21 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import './index.css';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
+import './index.css'
+import './i18n'
+
+import React, { Suspense } from 'react'
+import ReactDOM from 'react-dom'
+
+import App from './App'
+import reportWebVitals from './reportWebVitals'
+import { CircularProgress, ThemeProvider } from './styleguide'
+import theme from './styleguide/theme'
 
 ReactDOM.render(
   <React.StrictMode>
-    <App />
+    <ThemeProvider theme={theme}>
+      <Suspense fallback={<CircularProgress />}>
+        <App />
+      </Suspense>
+    </ThemeProvider>
   </React.StrictMode>,
   document.getElementById('root')
 );

@@ -1,0 +1,12 @@
+{
+  "create": {
+    "pickImage": "scegli un'immagine",
+    "changeImage": "cambia immagine",
+    "pickSound": "scegli un suono",
+    "changeSound": "cambia suono"
+  },
+  "general": {
+    "noImage": "nessuna immagine",
+    "save": "salva"
+  }
+}
