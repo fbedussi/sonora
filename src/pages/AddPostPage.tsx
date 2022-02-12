@@ -1,9 +1,14 @@
-import React, { useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
+import { Navigate } from 'react-router'
 import styled from 'styled-components'
 
-import MediaCard from '../components/MediaCard'
-import { Button, LoadingButton } from '../styleguide'
+import PostCard from '../components/PostCard'
+import { useUploadFile } from '../hooks/useUploadFile'
+import { useAddPostMutation } from '../services/posts'
+import { selectUserId } from '../store/user/selectors'
+import { Button, LinearProgress, LoadingButton } from '../styleguide'
 import {
   AudiotrackIcon, ChangeCircleIcon, ImageIcon,
   SaveIcon
@@ -16,6 +21,7 @@ const Wrapper = styled.div`
   justify-content: center;
   gap: ${theme.spacing(2)};
   height: 100%;
+  margin: 0 auto;
 `
 
 const ButtonsWrapper = styled.div`
@@ -24,19 +30,57 @@ const ButtonsWrapper = styled.div`
   justify-content: space-around;
 `
 
-const CreatePostPage: React.FC = () => {
+const AddPostPage: React.FC = () => {
   const { t } = useTranslation()
 
+  const userId = useSelector(selectUserId)
+
   const [imageSrc, setImageSrc] = useState('')
+  const [imageFile, setImageFile] = useState<File | null>(null)
   const [imageLoading, setImageLoading] = useState(false)
 
   const [audioSrc, setAudioSrc] = useState('')
+  const [audioFile, setAudioFile] = useState<File | null>(null)
   const [audioLoading, setAudioLoading] = useState(false)
 
   const imageInputRef = useRef<HTMLInputElement>(null)
   const audioInputRef = useRef<HTMLInputElement>(null)
 
-  return (
+  const [uploadImage, uploadImageResult] = useUploadFile()
+  const [uploadAudio, uploadAudioResult] = useUploadFile()
+
+  const [addPost, addPostResult] = useAddPostMutation()
+
+  useEffect(() => {
+    if (uploadImageResult.url && uploadAudioResult.url && userId) {
+      setImageSrc(uploadImageResult.url)
+      setAudioSrc(uploadAudioResult.url)
+      setImageFile(null)
+      setAudioFile(null)
+      addPost({ imageSrc: uploadImageResult.url, audioSrc: uploadAudioResult.url, userId })
+    }
+  }, [uploadImageResult.url, uploadAudioResult.url, addPost, userId])
+
+  const saveCard = () => {
+    if (imageFile && audioFile) {
+      uploadImage(imageFile, 'image')
+      uploadAudio(audioFile, 'audio')
+    }
+  }
+
+
+  const disableSaveButton =
+    !imageFile ||
+    !audioFile ||
+    (uploadImageResult.progress > 0 && !uploadImageResult.completed) ||
+    (uploadAudioResult.progress > 0 && !uploadAudioResult.completed)
+
+  const uploadProgress = (uploadImageResult.progress + uploadAudioResult.progress) / 2
+  const showUploadProgress = uploadProgress > 0 && uploadProgress < 100
+
+  return addPostResult.status === 'fulfilled' ? (
+    <Navigate to="/posts" />
+  ) : (
     <Wrapper>
       <input hidden ref={imageInputRef} type="file" accept="image/*" onChange={(e) => {
         const reader = new FileReader();
@@ -48,6 +92,7 @@ const CreatePostPage: React.FC = () => {
         });
         if (e.currentTarget.files && e.currentTarget.files[0]) {
           setImageLoading(true)
+          setImageFile(e.currentTarget.files[0])
           reader.readAsDataURL(e.currentTarget.files[0]);
         }
       }} />
@@ -61,6 +106,7 @@ const CreatePostPage: React.FC = () => {
         });
         if (e.currentTarget.files && e.currentTarget.files[0]) {
           setAudioLoading(true)
+          setAudioFile(e.currentTarget.files[0])
           reader.readAsDataURL(e.currentTarget.files[0]);
         }
       }} />
@@ -81,12 +127,20 @@ const CreatePostPage: React.FC = () => {
           {t(audioSrc ? 'create.changeSound' : 'create.pickSound')
           }</LoadingButton>}
       </ButtonsWrapper>
-      <MediaCard imageSrc={imageSrc} audioSrc={audioSrc} />
+      <PostCard imageSrc={imageSrc} audioSrc={audioSrc} />
       <ButtonsWrapper>
-        <Button variant="contained" startIcon={<SaveIcon />}>{t('general.save')}</Button>
+        <Button
+          disabled={disableSaveButton}
+          variant="contained"
+          onClick={saveCard}
+          startIcon={<SaveIcon />}
+        >
+          {t('general.save')}
+        </Button>
       </ButtonsWrapper>
+      {showUploadProgress && <LinearProgress value={uploadProgress} />}
     </Wrapper>
   )
 }
 
-export default CreatePostPage
+export default AddPostPage

@@ -1,3 +1,6 @@
+import { Suspense } from 'react'
+import { CircularProgress } from '../src/styleguide'
+
 import '../src/i18n'
 import '../src/index.css'
 
@@ -10,3 +13,11 @@ export const parameters = {
     },
   },
 }
+
+export const decorators = [
+  (Story) => (
+    <Suspense fallback={<CircularProgress />}>
+      <Story />
+    </Suspense>
+  ),
+];

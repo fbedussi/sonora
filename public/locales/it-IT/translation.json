@@ -7,6 +7,20 @@
   },
   "general": {
     "noImage": "nessuna immagine",
-    "save": "salva"
+    "save": "salva",
+    "dismiss": "annulla",
+    "ok": "ok",
+    "yes": "sì"
+  },
+  "login": {
+    "username": "nome utente",
+    "password": "password",
+    "login": "accedi"
+  },
+  "posts": {
+    "posts": "post",
+    "errorLoadingPosts": "errore nel caricare i post",
+    "confirmDelete": "vuoi davvero cancellare questo post?",
+    "errorDeletingPost": "errore nella cancellazione del post"
   }
 }

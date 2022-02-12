@@ -1,9 +1,8 @@
 import React, { useRef, useState } from 'react'
+import styled from 'styled-components'
 
-import {
-  Card, CardMedia, IconButton,
-  styled
-} from '../styleguide'
+import { Id } from '../model/model'
+import { Card, IconButton } from '../styleguide'
 import { ImageNotSupportedIcon, PauseIcon, PlayArrowIcon } from '../styleguide/icons'
 import theme from '../styleguide/theme'
 
@@ -16,7 +15,13 @@ const Wrapper = styled(Card)`
   position: relative;
 `
 
-const Button = styled(IconButton)`
+const PostMedia = styled.img`
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+`
+
+const PlayPauseButton = styled(IconButton)`
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
@@ -28,9 +33,10 @@ const Button = styled(IconButton)`
 type Props = {
   imageSrc?: string
   audioSrc?: string
+  setDeleteAlert?: (postId: Id) => void
 }
 
-const MediaCard: React.FC<Props> = ({ imageSrc, audioSrc }) => {
+const PostCard: React.FC<Props> = ({ imageSrc, audioSrc }) => {
   const [isPlaying, setIsPlaying] = useState(false)
 
   const audioRef = useRef<HTMLAudioElement>(null)
@@ -38,12 +44,11 @@ const MediaCard: React.FC<Props> = ({ imageSrc, audioSrc }) => {
   return (
     <Wrapper>
       <audio ref={audioRef} src={audioSrc} />
-      {imageSrc ? <CardMedia
-        component="img"
-        image={imageSrc}
+      {imageSrc ? <PostMedia
+        src={imageSrc}
         alt=""
       /> : <ImageNotSupportedIcon />}
-      {!!audioSrc && <Button color="primary" aria-label="play/pause" onClick={() => {
+      {!!audioSrc && <PlayPauseButton color="primary" aria-label="play/pause" onClick={() => {
         if (isPlaying) {
           audioRef.current?.pause()
           setIsPlaying(false)
@@ -53,10 +58,10 @@ const MediaCard: React.FC<Props> = ({ imageSrc, audioSrc }) => {
         }
       }}>
         {isPlaying ? <PauseIcon /> : <PlayArrowIcon />}
-      </Button>}
+      </PlayPauseButton>}
     </Wrapper>
   )
 }
 
-export default MediaCard
+export default PostCard
 
