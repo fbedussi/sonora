@@ -1,8 +1,12 @@
 import React from 'react'
+import styled from 'styled-components'
 
-import { AppBar, IconButton, Toolbar, Typography } from '../styleguide'
-import { MenuIcon } from '../styleguide/icons'
+import { AppBar, Toolbar, Typography } from '../styleguide'
 
+const Logo = styled.img`
+	width: 2rem;
+	height: 2rem;
+`
 type Props = {
 	title: string
 }
@@ -11,15 +15,7 @@ const Header: React.FC<Props> = ({ title }) => {
 	return (
 		<AppBar position="static">
 			<Toolbar>
-				<IconButton
-					size="large"
-					edge="start"
-					color="inherit"
-					aria-label="menu"
-					sx={{ mr: 2 }}
-				>
-					<MenuIcon />
-				</IconButton>
+				<Logo src="/logo.svg" />
 				<Typography
 					variant="h6"
 					component="div"
