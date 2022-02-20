@@ -21,6 +21,7 @@
     "posts": "post",
     "errorLoadingPosts": "errore nel caricare i post",
     "confirmDelete": "vuoi davvero cancellare questo post?",
-    "errorDeletingPost": "errore nella cancellazione del post"
+    "errorDeletingPost": "errore nella cancellazione del post",
+    "addPost": "crea un post"
   }
 }

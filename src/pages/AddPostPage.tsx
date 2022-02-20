@@ -4,6 +4,7 @@ import { useSelector } from 'react-redux'
 import { Navigate } from 'react-router'
 import styled from 'styled-components'
 
+import Header from '../components/Header'
 import PostCard from '../components/PostCard'
 import { useUploadFile } from '../hooks/useUploadFile'
 import { resizeImage } from '../libs/image'
@@ -17,12 +18,18 @@ import {
 import theme from '../styleguide/theme'
 
 const Wrapper = styled.div`
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+`
+
+const Form = styled.div`
+  flex: 1;
   display: flex;
   flex-direction: column;
   justify-content: center;
   gap: ${theme.spacing(2)};
-  height: 100%;
-  margin: 0 auto;
+  padding: ${theme.spacing(2)};
 `
 
 const ButtonsWrapper = styled.div`
@@ -51,6 +58,10 @@ const AddPostPage: React.FC = () => {
   const [uploadAudio, uploadAudioResult] = useUploadFile()
 
   const [addPost, addPostResult] = useAddPostMutation()
+
+  useEffect(() => {
+    imageInputRef.current?.click()
+  }, [])
 
   useEffect(() => {
     if (uploadImageResult.url && uploadAudioResult.url && userId) {
@@ -83,64 +94,68 @@ const AddPostPage: React.FC = () => {
     <Navigate to="/posts" />
   ) : (
     <Wrapper>
-      <input hidden ref={imageInputRef} type="file" accept="image/*" onChange={async (e) => {
-        const file = e.currentTarget.files && e.currentTarget.files[0]
-        if (!file) {
-          throw new Error('No image file')
-        }
+      <Header title={t('posts.addPost')} />
 
-        setImageLoading(true)
-
-        const resizedImage = await resizeImage(file, 960, 960)
-
-        setImageFile(resizedImage)
-        const src = URL.createObjectURL(resizedImage)
-        setImageSrc(src)
-        setImageLoading(false)
-      }} />
-      <input hidden ref={audioInputRef} type="file" accept="audio/*" onChange={(e) => {
-        const reader = new FileReader();
-        reader.addEventListener("load", (e) => {
-          if (typeof e.target?.result === 'string') {
-            setAudioSrc(e.target?.result)
-            setAudioLoading(false)
+      <Form>
+        <input hidden ref={imageInputRef} type="file" accept="image/*" onChange={async (e) => {
+          const file = e.currentTarget.files && e.currentTarget.files[0]
+          if (!file) {
+            throw new Error('No image file')
           }
-        });
-        if (e.currentTarget.files && e.currentTarget.files[0]) {
-          setAudioLoading(true)
-          setAudioFile(e.currentTarget.files[0])
-          reader.readAsDataURL(e.currentTarget.files[0]);
-        }
-      }} />
-      <ButtonsWrapper>
-        <LoadingButton
-          loading={imageLoading}
-          variant="outlined"
-          startIcon={imageSrc ? <ChangeCircleIcon /> : <ImageIcon />}
-          onClick={() => imageInputRef.current?.click()}>
-          {t(imageSrc ? 'create.changeImage' : 'create.pickImage')}
-        </LoadingButton>
 
-        {!!imageSrc && <LoadingButton
-          loading={audioLoading}
-          variant="outlined"
-          startIcon={audioSrc ? <ChangeCircleIcon /> : <AudiotrackIcon />}
-          onClick={() => audioInputRef.current?.click()}>
-          {t(audioSrc ? 'create.changeSound' : 'create.pickSound')
-          }</LoadingButton>}
-      </ButtonsWrapper>
-      <PostCard imageSrc={imageSrc} audioSrc={audioSrc} />
-      <ButtonsWrapper>
-        <Button
-          disabled={disableSaveButton}
-          variant="contained"
-          onClick={saveCard}
-          startIcon={<SaveIcon />}
-        >
-          {t('general.save')}
-        </Button>
-      </ButtonsWrapper>
-      {showUploadProgress && <LinearProgress value={uploadProgress} />}
+          setImageLoading(true)
+
+          const resizedImage = await resizeImage(file, 960, 960)
+
+          setImageFile(resizedImage)
+          const src = URL.createObjectURL(resizedImage)
+          setImageSrc(src)
+          setImageLoading(false)
+        }} />
+        <input hidden ref={audioInputRef} type="file" accept="audio/*" onChange={(e) => {
+          const reader = new FileReader();
+          reader.addEventListener("load", (e) => {
+            if (typeof e.target?.result === 'string') {
+              setAudioSrc(e.target?.result)
+              setAudioLoading(false)
+            }
+          });
+          if (e.currentTarget.files && e.currentTarget.files[0]) {
+            setAudioLoading(true)
+            setAudioFile(e.currentTarget.files[0])
+            reader.readAsDataURL(e.currentTarget.files[0]);
+          }
+        }} />
+        <ButtonsWrapper>
+          <LoadingButton
+            loading={imageLoading}
+            variant="outlined"
+            startIcon={imageSrc ? <ChangeCircleIcon /> : <ImageIcon />}
+            onClick={() => imageInputRef.current?.click()}>
+            {t(imageSrc ? 'create.changeImage' : 'create.pickImage')}
+          </LoadingButton>
+
+          {!!imageSrc && <LoadingButton
+            loading={audioLoading}
+            variant="outlined"
+            startIcon={audioSrc ? <ChangeCircleIcon /> : <AudiotrackIcon />}
+            onClick={() => audioInputRef.current?.click()}>
+            {t(audioSrc ? 'create.changeSound' : 'create.pickSound')
+            }</LoadingButton>}
+        </ButtonsWrapper>
+        <PostCard imageSrc={imageSrc} audioSrc={audioSrc} />
+        <ButtonsWrapper>
+          <Button
+            disabled={disableSaveButton}
+            variant="contained"
+            onClick={saveCard}
+            startIcon={<SaveIcon />}
+          >
+            {t('general.save')}
+          </Button>
+        </ButtonsWrapper>
+        {showUploadProgress && <LinearProgress value={uploadProgress} />}
+      </Form>
     </Wrapper>
   )
 }

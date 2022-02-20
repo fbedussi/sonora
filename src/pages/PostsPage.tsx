@@ -65,7 +65,7 @@ const PostsPage: React.FC = () => {
 				))}
 			</Posts>
 
-			<Fab color="primary" onClick={() => navigate('/post/add')}>
+			<Fab color="secondary" onClick={() => navigate('/post/add')}>
 				<AddIcon />
 			</Fab>
 
